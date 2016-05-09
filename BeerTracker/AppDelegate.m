@@ -10,6 +10,12 @@
 #import "TAGContainerOpener.h"
 #import "TAGManager.h"
 
+#define MIXPANEL_TOKEN @"ac10d9ad3d985270e72ce1ee02869453"
+
+@interface AppDelegate ()<TAGContainerOpenerNotifier>
+@end
+
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -18,36 +24,27 @@
 	[[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:0.22f green:0.17f blue:0.13f alpha:1.00f]];
 	[[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor whiteColor]}];
     
-    
-
-    #define MIXPANEL_TOKEN @"ac10d9ad3d985270e72ce1ee02869453"
-    
     [Mixpanel sharedInstanceWithToken:MIXPANEL_TOKEN];
     
     self.tagManager = [TAGManager instance];
     [self.tagManager.logger setLogLevel:kTAGLoggerLogLevelVerbose];
     
-    [TAGContainerOpener openContainerWithId:@"GTM-WFLLQ8"   // Update with your Container ID.
+    [TAGContainerOpener openContainerWithId:@"GTM-P3T8VS"   // Update with your Container ID.
                                  tagManager:self.tagManager
                                    openType:kTAGOpenTypePreferFresh
                                     timeout:nil
                                    notifier:self];
     
-    NSURL *url = [launchOptions valueForKey:UIApplicationLaunchOptionsURLKey];
-    if (url != nil) {
-        [self.tagManager previewWithUrl:url];
-    }
-
 
     return YES;
 }
-
 
 - (void)containerAvailable:(TAGContainer *)container {
     // Note that containerAvailable may be called on any thread, so you may need to dispatch back to
     // your main thread.
     dispatch_async(dispatch_get_main_queue(), ^{
         self.container = container;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ContainerOpened" object:nil];
     });
 }
 
